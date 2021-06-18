@@ -1,0 +1,16 @@
+<p> <%= @flight.passengers.count %> passengers </p>
+<p> Your flight (<%= @flight.id %>) from <%= @flight.from_airport.code %> 
+to <%= @flight.to_airport.code %> departs at <%= @flight.start %>. </p> 
+<h2> Passengers: </p>
+<table>
+  <tr> 
+    <th> Name </th>
+    <th> Email </th>
+  </tr>
+  <% @flight.passengers.each do |passenger| %>
+    <tr>
+      <td> <%= passenger.name %> </td> 
+      <td> <%= passenger.email %> </td>
+    </tr>
+  <% end %>
+</table>

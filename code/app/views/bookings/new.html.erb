@@ -1,0 +1,15 @@
+<%= form_with url: "/bookings/create", method: :get,  model: @booking do |booking_form| %>
+  <% @passengers.each do |passenger| %>
+    <%= booking_form.fields_for passenger, index: passenger.id  do |passenger_form| %>
+      <%= label_tag :email, "Email " %>
+      <%= passenger_form.text_field :email %>
+      <%= label_tag :name, "Name" %>
+      <%= passenger_form.text_field :name %>
+      
+    <% end %>  
+  <% end %>
+  <%# save flight %>
+  <% session[:flight] = params[:flight][:flight] %>
+  <%= submit_tag(value = "Book") %>
+<% end %>
+

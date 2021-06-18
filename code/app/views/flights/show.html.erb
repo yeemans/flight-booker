@@ -1,0 +1,56 @@
+<%= form_with url: flights_path, method: :get do |form|%>
+  <%= label_tag :from_airport, "From" %>
+  <%= collection_select(:airport, :from_airport, Airport.all, :code, :code)%>
+  <%= label_tag :to_airport, "To" %>
+  <%= collection_select(:airport, :to_airport, Airport.all, :code, :code)%>
+  <%= form.date_select :airport %>
+  <%= select_tag(:passengers, options_for_select(['1', '2', '3', '4'])) %>
+  <%= submit_tag(value = "Search Flights")%>
+<% end %>
+<%# display flights after search%>
+<% if params["airport(1i)"] %>
+  <% date =  Date.new(params["airport(1i)"].to_i,
+                    params["airport(2i)"].to_i,
+                    params["airport(3i)"].to_i)%> 
+  <% from = Airport.find_by(code: params[:airport][:from_airport]) %> 
+  <% to = Airport.find_by(code: params[:airport][:to_airport]) %>
+  <p>passengers: <%= params[:passengers]%></p>
+
+  <table>
+    <tr>
+      <th> Flight ID </th>
+      <th> From: </th>
+      <th> To: </th> 
+      <th> Departure </th>
+      <th> Duration </th>
+    </tr>
+    <% matching_flights = Flight.where(from_airport: from.id, to_airport: to.id) %>
+    <% matching_flights.each do |flight| %>
+      <% if flight.start.yday == date.yday and flight.start.year == date.year %>
+        <tr>
+          <td> <%= flight.id %> </td>
+          <td> <%= flight.from_airport.code %> </td>
+          <td> <%= flight.to_airport.code %> </td>
+          <td> <%= "#{flight.start.hour}:00" %> </td>
+          <% if flight.duration.hour == 1 %>
+            <td> <%= "#{flight.duration.hour} hour" %> </td>
+          <% else %>
+            <td> <%= "#{flight.duration.hour} hours" %> </td>
+          <% end %>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+  <%# have user select flight now %>
+  <%= form_for :flight, method: :get, url: '/bookings/new' do |form| %>
+    <% matching_flights.each do | flight | %>
+      <% if flight.start.yday == date.yday and flight.start.year == date.year %>
+        <%= form.radio_button :flight, flight.id %> 
+        <%= form.label :flight_id, flight.id %>
+      <% end %>
+    <% end %>
+    <%= form.hidden_field :passengers, value: params[:passengers] %>
+    <%= submit_tag(value = "Book Flights")%>
+  <% end %>
+  
+<% end %>
